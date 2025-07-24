@@ -23,6 +23,7 @@
 
     canvas {
       margin-top: 20px;
+      border-radius: 50%;
     }
 
     #spin {
@@ -79,19 +80,20 @@
     const angle = (2 * Math.PI) / numSegments;
 
     function drawWheel() {
+      ctx.clearRect(0, 0, 300, 300);
       for (let i = 0; i < numSegments; i++) {
         ctx.beginPath();
         ctx.moveTo(150, 150);
         ctx.arc(150, 150, 150, i * angle, (i + 1) * angle);
         ctx.fillStyle = colors[i];
         ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
         ctx.save();
         ctx.translate(150, 150);
         ctx.rotate(i * angle + angle / 2);
-        ctx.fillText(prizes[i], 100, 0);
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px Arial";
+        ctx.textAlign = "right";
+        ctx.fillText(prizes[i], 140, 0);
         ctx.restore();
       }
     }
@@ -99,7 +101,7 @@
     drawWheel();
 
     spinBtn.addEventListener("click", () => {
-      let rotation = Math.random() * 360 + 720; // spin 2+ times
+      let rotation = Math.random() * 360 + 720; // 2+ full spins
       canvas.style.transition = "transform 4s ease-out";
       canvas.style.transform = `rotate(${rotation}deg)`;
 
@@ -114,6 +116,9 @@
           spread: 70,
           origin: { y: 0.6 }
         });
+        canvas.style.transition = 'none';
+        canvas.style.transform = 'rotate(0deg)';
+        drawWheel(); // redraw after spin
       }, 4000);
     });
   </script>
