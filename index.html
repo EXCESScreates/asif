@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin & Win – @excess4fashion</title>
+
+  <!-- CSS (inline style) -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff5f7;
+      text-align: center;
+      padding: 40px;
+    }
+
+    #spinBtn {
+      background-color: #d63384;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    .footer {
+      margin-top: 40px;
+    }
+
+    .footer a {
+      color: #d63384;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎁 Spin & Win 🎁</h1>
+  <canvas id="wheelcanvas" width="400" height="400"></canvas>
+  <br />
+  <button id="spinBtn">SPIN NOW</button>
+  <div id="result"></div>
+
+  <div class="footer">
+    Follow us on <a href="https://instagram.com/excess4fashion" target="_blank">@excess4fashion</a>
+  </div>
+
+  <!-- JS LIBRARIES -->
+  <script src="https://cdn.jsdelivr.net/npm/winwheel@2.7.0/Winwheel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
+
+  <!-- JavaScript (inline) -->
+  <script>
+    const prizes = [
+      "10% OFF (on your next order)",
+      "FREE (surprise gift)",
+      "20% OFF (on your next order)",
+      "You WON ₹10 cashback",
+      "Buy One, Get One",
+      "15% OFF (on your next order)",
+      "You WON ₹12 cashback",
+      "Free Gifts (on your next order)"
+    ];
+
+    const wheel = new Winwheel({
+      canvasId: 'wheelcanvas',
+      numSegments: prizes.length,
+      outerRadius: 180,
+      segments: prizes.map(p => ({ fillStyle: getRandomColor(), text: p })),
+      animation: {
+        type: "spinToStop",
+        duration: 5,
+        spins: 7,
+        callbackFinished: showResult
+      }
+    });
+
+    function getRandomColor() {
+      const colors = ["#f8bbd0", "#f48fb1", "#f06292", "#ec407a", "#e91e63", "#d81b60", "#c2185b", "#ad1457"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    document.getElementById("spinBtn").addEventListener("click", () => {
+      wheel.startAnimation();
+      document.getElementById("result").innerText = "";
+      new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-01.mp3").play();
+    });
+
+    function showResult(indicatedSegment) {
+      document.getElementById("result").innerText = `🎉 ${indicatedSegment.text} 🎉`;
+      confettiEffect();
+    }
+
+    function confettiEffect() {
+      const confettiSettings = { target: 'wheelcanvas', max: 80 };
+      const confetti = new ConfettiGenerator(confettiSettings);
+      confetti.render();
+
+      setTimeout(() => confetti.clear(), 3000);
+    }
+  </script>
+
+</body>
+</html>
