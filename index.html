@@ -6,113 +6,90 @@
   <title>🎁 Spin & Win 🎁</title>
   <style>
     body {
-      background-color: #fff6f9;
+      font-family: Arial, sans-serif;
       text-align: center;
-      font-family: 'Segoe UI', sans-serif;
+      background: #fff5f5;
       margin: 0;
       padding: 0;
+      overflow: hidden;
     }
 
     h1 {
+      font-size: 2.5em;
       margin-top: 30px;
-      font-size: 2.5rem;
     }
 
-    .wheel-container {
-      position: relative;
+    #wheel {
       margin: 40px auto;
       width: 300px;
       height: 300px;
-    }
-
-    .wheel {
-      width: 100%;
-      height: 100%;
       border-radius: 50%;
-      border: 10px solid #ff0000;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      background: conic-gradient(
-        #ffcf00 0deg 45deg,
-        #00ffcc 45deg 90deg,
-        #ff66cc 90deg 135deg,
-        #66ccff 135deg 180deg,
-        #cc66ff 180deg 225deg,
-        #66ff66 225deg 270deg,
-        #ff9933 270deg 315deg,
-        #dddddd 315deg 360deg
-      );
+      border: 12px solid red;
       position: relative;
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      transition: transform 5s ease-out;
     }
 
     .pointer {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid gold;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 40px solid yellow;
+      position: absolute;
+      top: -40px;
+      left: 125px;
     }
 
-    .spin-btn {
-      padding: 12px 30px;
-      font-size: 18px;
-      background-color: #ffcc00;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      color: #000;
-      margin-top: 30px;
-      font-weight: bold;
-    }
-
-    .result {
+    #spin {
+      background: yellow;
+      color: black;
+      border: 2px solid black;
+      padding: 12px 25px;
       font-size: 20px;
-      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 8px;
     }
 
-    .instagram {
-      margin-top: 40px;
-      font-size: 16px;
-      color: #000;
-    }
-
-    .instagram a {
-      color: #e91e63;
-      text-decoration: none;
+    #result {
+      font-size: 1.5em;
+      margin-top: 25px;
       font-weight: bold;
     }
 
-    canvas.confetti {
+    .footer {
+      margin-top: 30px;
+      font-size: 1.2em;
+    }
+
+    canvas {
       position: fixed;
-      pointer-events: none;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      z-index: 999;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <h1>🎁 Spin & Win 🎁</h1>
 
-  <div class="wheel-container">
-    <div class="pointer"></div>
-    <div class="wheel" id="wheel"></div>
+  <h1>🎁 Spin & Win 🎁</h1>
+  <div class="pointer"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <canvas id="wheel" width="300" height="300"></canvas>
+
+  <button id="spin">SPIN NOW</button>
+
+  <p id="result"></p>
+
+  <div class="footer">
+    Follow us on <b style="color:#ff007f">@excess4fashion</b>
   </div>
 
-  <button class="spin-btn" onclick="spin()">SPIN NOW</button>
-
-  <div class="result" id="result"></div>
-
-  <div class="instagram">Follow us on <a href="https://instagram.com/excess4fashion" target="_blank">@excess4fashion</a></div>
-
-  <canvas id="confettiCanvas" class="confetti"></canvas>
-
-  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2023/02/22/audio_593b58fdd1.mp3"></audio>
+  <!-- 🎉 Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- 🔊 Sound CDN -->
+  <audio id="spinSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
 
   <script>
     const prizes = [
@@ -126,68 +103,60 @@
       "Free Gifts On Next order"
     ];
 
+    const colors = ["#ff9999", "#99ccff", "#ccffcc", "#ffc966", "#ffccff", "#b3e6b3", "#ffd699", "#c2c2f0"];
     const wheel = document.getElementById("wheel");
+    const ctx = wheel.getContext("2d");
     const result = document.getElementById("result");
+    const spinBtn = document.getElementById("spin");
     const spinSound = document.getElementById("spinSound");
-    const confettiCanvas = document.getElementById("confettiCanvas");
-    let spinning = false;
 
-    function spin() {
-      if (spinning) return;
-      spinning = true;
-      result.textContent = "";
-      const rotation = 3600 + Math.floor(Math.random() * 360);
-      const prizeIndex = Math.floor(((rotation % 360) / 360) * prizes.length);
-      const finalPrize = prizes[prizes.length - 1 - prizeIndex];
+    let angle = 0;
+    const arcSize = (2 * Math.PI) / prizes.length;
 
-      spinSound.play();
-      wheel.style.transform = `rotate(${rotation}deg)`;
+    function drawWheel() {
+      for (let i = 0; i < prizes.length; i++) {
+        const startAngle = i * arcSize;
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 150, startAngle, startAngle + arcSize);
+        ctx.fill();
 
-      setTimeout(() => {
-        result.innerHTML = `🎉 You won: <strong>${finalPrize}</strong> 🎉`;
-        spinning = false;
-        launchConfetti();
-      }, 5000);
-    }
-
-    // Confetti animation using canvas
-    const ctx = confettiCanvas.getContext("2d");
-    const confettis = [];
-
-    function launchConfetti() {
-      confettis.length = 0;
-      for (let i = 0; i < 150; i++) {
-        confettis.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight - window.innerHeight,
-          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-          size: Math.random() * 8 + 4,
-          speed: Math.random() * 3 + 2,
-        });
+        // Text
+        ctx.save();
+        ctx.translate(150, 150);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.fillStyle = "black";
+        ctx.font = "bold 13px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(prizes[i], 140, 5);
+        ctx.restore();
       }
     }
 
-    function drawConfetti() {
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettis.forEach(confetti => {
-        ctx.fillStyle = confetti.color;
-        ctx.beginPath();
-        ctx.arc(confetti.x, confetti.y, confetti.size, 0, Math.PI * 2);
-        ctx.fill();
-        confetti.y += confetti.speed;
-        if (confetti.y > window.innerHeight) confetti.y = -confetti.size;
-      });
-      requestAnimationFrame(drawConfetti);
-    }
+    drawWheel();
 
-    function resizeCanvas() {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
+    spinBtn.addEventListener("click", () => {
+      spinSound.play();
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-    drawConfetti();
+      const randomSpin = Math.floor(Math.random() * 360) + 1440; // Full spin + random
+      angle += randomSpin;
+
+      wheel.style.transform = `rotate(${angle}deg)`;
+
+      const selectedIndex = Math.floor(prizes.length - (angle / (360 / prizes.length)) % prizes.length) % prizes.length;
+
+      setTimeout(() => {
+        result.innerHTML = `🎉 You won: <strong>${prizes[selectedIndex]}</strong> 🎉`;
+
+        // Confetti
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      }, 5200); // Match spin duration
+    });
   </script>
 </body>
 </html>
