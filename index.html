@@ -3,83 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spin the Wheel - Excess4Fashion</title>
+  <title>Spin & Win - Excess4Fashion</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #fff9e6;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff7e6;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      margin: 0;
     }
-    #wheel-container {
+
+    .wheel-container {
       position: relative;
       width: 300px;
       height: 300px;
-      border: 10px solid red;
-      border-radius: 50%;
-      overflow: hidden;
       margin-bottom: 20px;
     }
-    #wheel {
+
+    .wheel {
       width: 100%;
       height: 100%;
-      transition: transform 5s ease-out;
+      border-radius: 50%;
+      border: 8px solid red;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      background: conic-gradient(
+        #ffe066 0deg 45deg,
+        #fab1a0 45deg 90deg,
+        #81ecec 90deg 135deg,
+        #74b9ff 135deg 180deg,
+        #ffeaa7 180deg 225deg,
+        #55efc4 225deg 270deg,
+        #a29bfe 270deg 315deg,
+        #fd79a8 315deg 360deg
+      );
+      position: relative;
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
     }
-    #pointer {
+
+    .wheel-text {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      left: 50%;
+      top: 50%;
+      transform-origin: left top;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      font-size: 12px;
+      font-weight: bold;
+      color: #2d3436;
+    }
+
+    .pointer {
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid black;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 20px solid #d63031;
       position: absolute;
-      top: -30px;
+      top: -25px;
       left: 50%;
       transform: translateX(-50%);
+      z-index: 10;
     }
-    #spinBtn {
-      background: yellow;
-      color: black;
-      font-size: 20px;
-      padding: 10px 20px;
+
+    .spin-btn {
+      background-color: #f1c40f;
       border: none;
-      cursor: pointer;
-      border-radius: 10px;
-    }
-    #result {
+      padding: 12px 24px;
       font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .message {
       margin-top: 20px;
       text-align: center;
-    }
-    .claim-text {
-      color: #333;
-      font-size: 14px;
-      margin-top: 10px;
+      font-size: 16px;
+      color: #2d3436;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <div id="wheel-container">
-    <div id="pointer"></div>
-    <canvas id="wheel" width="300" height="300"></canvas>
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <div class="wheel" id="wheel">
+      <div class="wheel-text" style="transform: rotate(22.5deg) translateX(-50%) translateY(-50%)">10% OFF</div>
+      <div class="wheel-text" style="transform: rotate(67.5deg) translateX(-50%) translateY(-50%)">FREE GIFT</div>
+      <div class="wheel-text" style="transform: rotate(112.5deg) translateX(-50%) translateY(-50%)">20% OFF</div>
+      <div class="wheel-text" style="transform: rotate(157.5deg) translateX(-50%) translateY(-50%)">10 Rs Cashback</div>
+      <div class="wheel-text" style="transform: rotate(202.5deg) translateX(-50%) translateY(-50%)">Buy 1 Get 1</div>
+      <div class="wheel-text" style="transform: rotate(247.5deg) translateX(-50%) translateY(-50%)">15% OFF</div>
+      <div class="wheel-text" style="transform: rotate(292.5deg) translateX(-50%) translateY(-50%)">12 Rs Cashback</div>
+      <div class="wheel-text" style="transform: rotate(337.5deg) translateX(-50%) translateY(-50%)">Free Gift</div>
+    </div>
   </div>
-  <button id="spinBtn">SPIN NOW</button>
-  <div id="result"></div>
+  <button class="spin-btn" id="spinBtn">SPIN NOW</button>
+  <div class="message" id="message"></div>
 
-  <audio id="spinSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <!-- Sound and confetti -->
+  <audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/mechanical-gear-1.mp3"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spinBtn");
-    const result = document.getElementById("result");
-    const ctx = wheel.getContext("2d");
-    const spinSound = document.getElementById("spinSound");
+    const wheel = document.getElementById('wheel');
+    const btn = document.getElementById('spinBtn');
+    const msg = document.getElementById('message');
+    const spinSound = document.getElementById('spinSound');
+    const winSound = document.getElementById('winSound');
 
-    const prizes = [
+    const segments = [
       "10% OFF On Next order",
       "FREE (Surprise Gift)",
       "20% OFF On Next order",
@@ -90,62 +134,34 @@
       "Free Gifts On Next order"
     ];
 
-    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF", "#FF6B6B"];
-    let anglePerSlice = (2 * Math.PI) / prizes.length;
-
-    function drawWheel() {
-      for (let i = 0; i < prizes.length; i++) {
-        ctx.beginPath();
-        ctx.fillStyle = colors[i];
-        ctx.moveTo(150, 150);
-        ctx.arc(150, 150, 150, i * anglePerSlice, (i + 1) * anglePerSlice);
-        ctx.fill();
-        ctx.save();
-        ctx.translate(150, 150);
-        ctx.rotate(i * anglePerSlice + anglePerSlice / 2);
-        ctx.fillStyle = "black";
-        ctx.font = "bold 12px Arial";
-        ctx.fillText(prizes[i], 40, 5);
-        ctx.restore();
-      }
+    const isSpun = localStorage.getItem("hasSpun");
+    if (isSpun) {
+      btn.disabled = true;
+      btn.innerText = "Already Spun";
     }
 
-    drawWheel();
-
-    function getStoredSpinStatus() {
-      return localStorage.getItem("hasSpun") === "true";
-    }
-
-    function storeSpinStatus() {
-      localStorage.setItem("hasSpun", "true");
-    }
-
-    spinBtn.addEventListener("click", () => {
-      if (getStoredSpinStatus()) {
-        alert("You have already spun the wheel!");
-        return;
-      }
+    btn.addEventListener('click', () => {
+      if (localStorage.getItem("hasSpun")) return;
 
       spinSound.play();
+      btn.disabled = true;
 
-      const randomIndex = Math.floor(Math.random() * prizes.length);
-      const degree = 360 * 5 + (360 / prizes.length) * randomIndex + 360 / prizes.length / 2;
-
-      wheel.style.transition = "transform 5s ease-out";
-      wheel.style.transform = `rotate(${degree}deg)`;
-
-      storeSpinStatus();
+      const random = Math.floor(Math.random() * segments.length);
+      const degrees = 360 * 5 + (360 / segments.length) * random;
+      wheel.style.transform = `rotate(${degrees}deg)`;
 
       setTimeout(() => {
+        spinSound.pause();
+        winSound.play();
         confetti({
           particleCount: 150,
-          spread: 60
+          spread: 70,
+          origin: { y: 0.6 },
         });
 
-        result.innerHTML = `
-          <h2 class="result-text">🎉 You won: ${prizes[randomIndex]} 🎉</h2>
-          <p class="claim-text">📸 Take a screenshot and send it to us on Instagram <strong>@excess4fashion</strong> to claim your gift!</p>
-        `;
+        msg.innerHTML = `<strong>🎉 You won:</strong> ${segments[random]}<br><br><span style='color:green;'>📸 Take a screenshot and send it to us on Instagram <strong>@excess4fashion</strong> to claim your gift!</span>`;
+
+        localStorage.setItem("hasSpun", true);
       }, 5200);
     });
   </script>
