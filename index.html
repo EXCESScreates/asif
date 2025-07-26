@@ -1,205 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Spin & Win</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #fff9f9;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-top: 30px;
-    }
-
-    #wheel {
-      width: 350px;
-      height: 350px;
-      border-radius: 50%;
-      border: 8px solid red;
-      margin: 30px auto;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #wheel canvas {
-      width: 100%;
-      height: 100%;
-    }
-
-    #pointer {
-      width: 0;
-      height: 0;
-      border-left: 25px solid transparent;
-      border-right: 25px solid transparent;
-      border-bottom: 40px solid yellow;
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    #spinBtn {
-      background-color: yellow;
-      color: black;
-      border: 2px solid black;
-      border-radius: 12px;
-      padding: 10px 25px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
-    #result {
-      margin-top: 30px;
-      font-size: 1.2rem;
-    }
-
-    #confetti-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .segment-text {
-      transform: rotate(90deg);
-      transform-origin: center;
-      writing-mode: vertical-lr;
-      text-orientation: upright;
-      font-size: 10px;
-    }
-
-    a {
-      color: #d60000;
-      font-weight: bold;
-      text-decoration: none;
-    }
-  </style>
-</head>
-<body>
-  <h1>🎁 Spin & Win 🎁</h1>
-  <div id="pointer"></div>
-  <div id="wheel">
-    <canvas id="canvas" width="350" height="350"></canvas>
-  </div>
-  <button id="spinBtn">SPIN NOW</button>
-
-  <div id="result"></div>
-  <div id="confetti-container"></div>
-
-  <!-- Sounds -->
-  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_31c3c3cd52.mp3"></audio>
-  <audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3b0a4fe6c3.mp3"></audio>
-
-  <!-- External confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const spinBtn = document.getElementById("spinBtn");
-    const result = document.getElementById("result");
-    const spinSound = document.getElementById("spinSound");
-    const winSound = document.getElementById("winSound");
-
-    const options = [
-      "10% OFF On Next order",
-      "FREE (Surprise Gift)",
-      "20% OFF On Next order",
-      "WON 10 rupee cashback",
-      "Buy One, Get One",
-      "15% OFF On Next order",
-      "WON 12 rupee cashback",
-      "Free Gifts On Next order"
-    ];
-
-    const colors = ["#FFD700", "#00FA9A", "#FF69B4", "#BA55D3", "#1E90FF", "#FFA07A", "#8A2BE2", "#F4A460"];
-
-    const segmentAngle = 360 / options.length;
-
-    function drawWheel() {
-      for (let i = 0; i < options.length; i++) {
-        const startAngle = (i * segmentAngle * Math.PI) / 180;
-        const endAngle = ((i + 1) * segmentAngle * Math.PI) / 180;
-
-        ctx.beginPath();
-        ctx.moveTo(175, 175);
-        ctx.arc(175, 175, 175, startAngle, endAngle);
-        ctx.fillStyle = colors[i];
-        ctx.fill();
-
-        ctx.save();
-        ctx.translate(175, 175);
-        ctx.rotate(startAngle + (endAngle - startAngle) / 2);
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 12px Roboto";
-        ctx.fillText(options[i], 100, 0);
-        ctx.restore();
-      }
-    }
-
-    drawWheel();
-
-    let deg = 0;
-    let spinning = false;
-
-    spinBtn.addEventListener("click", () => {
-      if (spinning || localStorage.getItem("hasSpun")) {
-        alert("You can spin only once!");
-        return;
-      }
-
-      spinning = true;
-      spinSound.play();
-
-      const randomDeg = Math.floor(3600 + Math.random() * 720);
-      const duration = 5000;
-      const step = randomDeg / (duration / 10);
-      let currentDeg = 0;
-
-      const spinInterval = setInterval(() => {
-        currentDeg += step;
-        if (currentDeg >= randomDeg) {
-          clearInterval(spinInterval);
-          deg = (deg + randomDeg) % 360;
-          canvas.style.transform = `rotate(${deg}deg)`;
-          showResult();
-          spinning = false;
-          localStorage.setItem("hasSpun", true);
-        } else {
-          canvas.style.transform = `rotate(${(deg + currentDeg) % 360}deg)`;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin & Win | Excess4Fashion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffeef8 100%);
+            min-height: 100vh;
         }
-      }, 10);
-    });
-
-    function showResult() {
-      const index = Math.floor((360 - deg % 360) / segmentAngle) % options.length;
-      const prize = options[index];
-
-      result.innerHTML = `🎉 You won: <strong>${prize}</strong> 🎉<br><br>
-      <b>📸 Take a screenshot and send it to us on <a href="https://instagram.com/excess4fashion" target="_blank">@excess4fashion</a> to claim your gift.</b>`;
-
-      confetti({
-        particleCount: 200,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-
-      winSound.play();
-    }
-  </script>
+        
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            transform: rotate(0deg);
+            border: 8px solid #fff;
+        }
+        
+        .wheel-item {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-align: center;
+            padding-bottom: 40px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        .wheel-center {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff4757;
+            z-index: 5;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            position: relative;
+            animation: modalAppear 0.5s ease-out;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .reward-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ff4757;
+        }
+        
+        .form-container {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 1s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .spin-btn {
+            transition: all 0.3s;
+        }
+        
+        .spin-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .spin-btn.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 99;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="py-10 px-4">
+    <div class="max-w-md mx-auto text-center">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-pink-600 mb-2">SPIN & WIN</h1>
+            <p class="text-gray-600">Spin the wheel to claim your exclusive reward!</p>
+        </div>
+        
+        <div class="wheel-container mb-10">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- Wheel segments will be added by JavaScript -->
+            </div>
+            <div class="wheel-center">
+                <div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-gift text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <button id="spinBtn" class="spin-btn bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-10 rounded-full font-bold text-lg shadow-lg hover:shadow-xl">
+            SPIN NOW
+        </button>
+        
+        <div id="alreadySpun" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+            <i class="fas fa-info-circle mr-2"></i>
+            You've already spun the wheel! Check your reward below.
+        </div>
+        
+        <div id="formContainer" class="form-container mt-8 bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">🎉 Congratulations!</h3>
+            <p class="text-gray-600 mb-4">To claim your reward:</p>
+            <ol class="text-left mb-6 text-gray-700 list-decimal pl-5 space-y-2">
+                <li>Fill the form below</li>
+                <li><strong>Take a screenshot</strong> of your reward</li>
+                <li>Send it to us on Instagram</li>
+            </ol>
+            <a href="https://instagram.com/excess4fashion" target="_blank" class="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-6 rounded-full font-medium mb-6">
+                <i class="fab fa-instagram mr-2"></i> DM Us on Instagram
+            </a>
+            
+            <div class="mt-6">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSenZ4TMpqKcAUviv6A23dEpXuZSsvjKmcudhVh0uuZ-bSQNew/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
+        </div>
+    </div>
+    
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <div id="rewardTitle" class="reward-title"></div>
+            <p class="text-gray-700 mb-4">✅ <strong>You just won <span id="rewardText"></span>!</strong></p>
+            <p class="text-gray-600 mb-2">🎁 To claim it:</p>
+            <ol class="text-left mb-4 text-gray-700 list-decimal pl-5 space-y-1 text-sm">
+                <li>Fill the form below</li>
+                <li><strong>Take a screenshot</strong> of this reward</li>
+                <li>Send it to us on Instagram</li>
+            </ol>
+            <a href="https://instagram.com/excess4fashion" target="_blank" class="inline-block bg-blue-500 text-white py-2 px-4 rounded-full text-sm font-medium mb-4">
+                👉 Click here to DM us on Instagram
+            </a>
+            <button id="closeModal" class="mt-4 bg-gray-200 text-gray-800 py-2 px-6 rounded-full font-medium text-sm">
+                Got it!
+            </button>
+        </div>
+    </div>
+    
+    <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wheel configuration
+            const wheel = document.getElementById('wheel');
+            const spinBtn = document.getElementById('spinBtn');
+            const alreadySpun = document.getElementById('alreadySpun');
+            const formContainer = document.getElementById('formContainer');
+            const rewardModal = document.getElementById('rewardModal');
+            const rewardTitle = document.getElementById('rewardTitle');
+            const rewardText = document.getElementById('rewardText');
+            const closeModal = document.getElementById('closeModal');
+            const spinSound = document.getElementById('spinSound');
+            const winSound = document.getElementById('winSound');
+            
+            const rewards = [
+                { text: "10% OFF (next order)", color: "#FF9F1C" },
+                { text: "FREE (surprise gift)", color: "#FF6392" },
+                { text: "20% OFF (next order)", color: "#7B2CBF" },
+                { text: "You WON (₹10 cashback)", color: "#2EC4B6" },
+                { text: "Buy One, Get One", color: "#E71D36" },
+                { text: "₹15 OFF (next order)", color: "#662E9B" },
+                { text: "You WON (₹12 cashback)", color: "#F4A261" },
+                { text: "Free Gifts (next order)", color: "#3A86FF" }
+            ];
+            
+            // Check if user already spun
+            if(localStorage.getItem('hasSpun') === 'true') {
+                spinBtn.classList.add('disabled');
+                spinBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> SPIN NOW';
+                alreadySpun.classList.remove('hidden');
+                formContainer.style.display = 'block';
+                
+                // Show previous reward if exists
+                const savedReward = localStorage.getItem('lastReward');
+                if(savedReward) {
+                    rewardTitle.textContent = savedReward;
+                    rewardText.textContent = savedReward;
+                }
+            }
+            
+            // Create wheel segments
+            function createWheel() {
+                const segmentAngle = 360 / rewards.length;
+                
+                rewards.forEach((reward, index) => {
+                    const segment = document.createElement('div');
+                    segment.className = 'wheel-item';
+                    segment.textContent = reward.text;
+                    segment.style.backgroundColor = reward.color;
+                    segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                    
+                    // Adjust text rotation
+                    const textRotation = index * segmentAngle + segmentAngle/2;
+                    segment.style.transform = `rotate(${index * segmentAngle}deg) skewY(${90 - segmentAngle}deg)`;
+                    
+                    wheel.appendChild(segment);
+                });
+            }
+            
+            createWheel();
+            
+            // Spin the wheel
+            spinBtn.addEventListener('click', function() {
+                if(localStorage.getItem('hasSpun') === 'true') {
+                    return;
+                }
+                
+                spinBtn.disabled = true;
+                spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> SPINNING...';
+                
+                // Play spin sound
+                spinSound.currentTime = 0;
+                spinSound.play();
+                
+                // Random rotation (5-10 full rotations + random segment)
+                const segmentAngle = 360 / rewards.length;
+                const extraRotations = 5 + Math.floor(Math.random() * 5);
+                const randomSegment = Math.floor(Math.random() * rewards.length);
+                const rotationAngle = (360 * extraRotations) + (360 - (randomSegment * segmentAngle + segmentAngle/2));
+                
+                wheel.style.transform = `rotate(${rotationAngle}deg)`;
+                
+                // After spin completes
+                setTimeout(() => {
+                    spinSound.pause();
+                    
+                    // Play win sound
+                    winSound.currentTime = 0;
+                    winSound.play();
+                    
+                    // Show reward
+                    const wonReward = rewards[randomSegment].text;
+                    rewardTitle.textContent = wonReward;
+                    rewardText.textContent = wonReward;
+                    
+                    // Show modal
+                    rewardModal.style.display = 'flex';
+                    
+                    // Trigger confetti
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                    
+                    // Save to localStorage
+                    localStorage.setItem('hasSpun', 'true');
+                    localStorage.setItem('lastReward', wonReward);
+                    
+                    // Show form
+                    formContainer.style.display = 'block';
+                    
+                    // Update button
+                    spinBtn.innerHTML = '<i class="fas fa-lock mr-2"></i> SPIN NOW';
+                }, 5000);
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                rewardModal.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            rewardModal.addEventListener('click', function(e) {
+                if(e.target === rewardModal) {
+                    rewardModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
