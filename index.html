@@ -2,128 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spin & Win - Excess4Fashion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spin & Win</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet"/>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #fff7e6;
+      font-family: 'Roboto', sans-serif;
+      background-color: #fff9f9;
+      text-align: center;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      overflow-x: hidden;
     }
 
-    .wheel-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin-bottom: 20px;
+    h1 {
+      font-size: 2.5rem;
+      margin-top: 30px;
     }
 
-    .wheel {
-      width: 100%;
-      height: 100%;
+    #wheel {
+      width: 350px;
+      height: 350px;
       border-radius: 50%;
       border: 8px solid red;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      background: conic-gradient(
-        #ffe066 0deg 45deg,
-        #fab1a0 45deg 90deg,
-        #81ecec 90deg 135deg,
-        #74b9ff 135deg 180deg,
-        #ffeaa7 180deg 225deg,
-        #55efc4 225deg 270deg,
-        #a29bfe 270deg 315deg,
-        #fd79a8 315deg 360deg
-      );
+      margin: 30px auto;
       position: relative;
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      overflow: hidden;
     }
 
-    .wheel-text {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      left: 50%;
-      top: 50%;
-      transform-origin: left top;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      writing-mode: vertical-rl;
-      text-orientation: upright;
-      font-size: 12px;
-      font-weight: bold;
-      color: #2d3436;
+    #wheel canvas {
+      width: 100%;
+      height: 100%;
     }
 
-    .pointer {
+    #pointer {
       width: 0;
       height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 20px solid #d63031;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 40px solid yellow;
       position: absolute;
-      top: -25px;
+      top: -40px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 10;
     }
 
-    .spin-btn {
-      background-color: #f1c40f;
-      border: none;
-      padding: 12px 24px;
-      font-size: 18px;
+    #spinBtn {
+      background-color: yellow;
+      color: black;
+      border: 2px solid black;
+      border-radius: 12px;
+      padding: 10px 25px;
+      font-size: 1.3rem;
       font-weight: bold;
-      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      margin-top: 20px;
     }
 
-    .message {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 16px;
-      color: #2d3436;
-      font-weight: 500;
+    #result {
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    #confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .segment-text {
+      transform: rotate(90deg);
+      transform-origin: center;
+      writing-mode: vertical-lr;
+      text-orientation: upright;
+      font-size: 10px;
+    }
+
+    a {
+      color: #d60000;
+      font-weight: bold;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="wheel-container">
-    <div class="pointer"></div>
-    <div class="wheel" id="wheel">
-      <div class="wheel-text" style="transform: rotate(22.5deg) translateX(-50%) translateY(-50%)">10% OFF</div>
-      <div class="wheel-text" style="transform: rotate(67.5deg) translateX(-50%) translateY(-50%)">FREE GIFT</div>
-      <div class="wheel-text" style="transform: rotate(112.5deg) translateX(-50%) translateY(-50%)">20% OFF</div>
-      <div class="wheel-text" style="transform: rotate(157.5deg) translateX(-50%) translateY(-50%)">10 Rs Cashback</div>
-      <div class="wheel-text" style="transform: rotate(202.5deg) translateX(-50%) translateY(-50%)">Buy 1 Get 1</div>
-      <div class="wheel-text" style="transform: rotate(247.5deg) translateX(-50%) translateY(-50%)">15% OFF</div>
-      <div class="wheel-text" style="transform: rotate(292.5deg) translateX(-50%) translateY(-50%)">12 Rs Cashback</div>
-      <div class="wheel-text" style="transform: rotate(337.5deg) translateX(-50%) translateY(-50%)">Free Gift</div>
-    </div>
+  <h1>🎁 Spin & Win 🎁</h1>
+  <div id="pointer"></div>
+  <div id="wheel">
+    <canvas id="canvas" width="350" height="350"></canvas>
   </div>
-  <button class="spin-btn" id="spinBtn">SPIN NOW</button>
-  <div class="message" id="message"></div>
+  <button id="spinBtn">SPIN NOW</button>
 
-  <!-- Sound and confetti -->
-  <audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/mechanical-gear-1.mp3"></audio>
-  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <div id="result"></div>
+  <div id="confetti-container"></div>
+
+  <!-- Sounds -->
+  <audio id="spinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_31c3c3cd52.mp3"></audio>
+  <audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3b0a4fe6c3.mp3"></audio>
+
+  <!-- External confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
   <script>
-    const wheel = document.getElementById('wheel');
-    const btn = document.getElementById('spinBtn');
-    const msg = document.getElementById('message');
-    const spinSound = document.getElementById('spinSound');
-    const winSound = document.getElementById('winSound');
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const result = document.getElementById("result");
+    const spinSound = document.getElementById("spinSound");
+    const winSound = document.getElementById("winSound");
 
-    const segments = [
+    const options = [
       "10% OFF On Next order",
       "FREE (Surprise Gift)",
       "20% OFF On Next order",
@@ -134,36 +125,81 @@
       "Free Gifts On Next order"
     ];
 
-    const isSpun = localStorage.getItem("hasSpun");
-    if (isSpun) {
-      btn.disabled = true;
-      btn.innerText = "Already Spun";
+    const colors = ["#FFD700", "#00FA9A", "#FF69B4", "#BA55D3", "#1E90FF", "#FFA07A", "#8A2BE2", "#F4A460"];
+
+    const segmentAngle = 360 / options.length;
+
+    function drawWheel() {
+      for (let i = 0; i < options.length; i++) {
+        const startAngle = (i * segmentAngle * Math.PI) / 180;
+        const endAngle = ((i + 1) * segmentAngle * Math.PI) / 180;
+
+        ctx.beginPath();
+        ctx.moveTo(175, 175);
+        ctx.arc(175, 175, 175, startAngle, endAngle);
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(175, 175);
+        ctx.rotate(startAngle + (endAngle - startAngle) / 2);
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 12px Roboto";
+        ctx.fillText(options[i], 100, 0);
+        ctx.restore();
+      }
     }
 
-    btn.addEventListener('click', () => {
-      if (localStorage.getItem("hasSpun")) return;
+    drawWheel();
 
+    let deg = 0;
+    let spinning = false;
+
+    spinBtn.addEventListener("click", () => {
+      if (spinning || localStorage.getItem("hasSpun")) {
+        alert("You can spin only once!");
+        return;
+      }
+
+      spinning = true;
       spinSound.play();
-      btn.disabled = true;
 
-      const random = Math.floor(Math.random() * segments.length);
-      const degrees = 360 * 5 + (360 / segments.length) * random;
-      wheel.style.transform = `rotate(${degrees}deg)`;
+      const randomDeg = Math.floor(3600 + Math.random() * 720);
+      const duration = 5000;
+      const step = randomDeg / (duration / 10);
+      let currentDeg = 0;
 
-      setTimeout(() => {
-        spinSound.pause();
-        winSound.play();
-        confetti({
-          particleCount: 150,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-
-        msg.innerHTML = `<strong>🎉 You won:</strong> ${segments[random]}<br><br><span style='color:green;'>📸 Take a screenshot and send it to us on Instagram <strong>@excess4fashion</strong> to claim your gift!</span>`;
-
-        localStorage.setItem("hasSpun", true);
-      }, 5200);
+      const spinInterval = setInterval(() => {
+        currentDeg += step;
+        if (currentDeg >= randomDeg) {
+          clearInterval(spinInterval);
+          deg = (deg + randomDeg) % 360;
+          canvas.style.transform = `rotate(${deg}deg)`;
+          showResult();
+          spinning = false;
+          localStorage.setItem("hasSpun", true);
+        } else {
+          canvas.style.transform = `rotate(${(deg + currentDeg) % 360}deg)`;
+        }
+      }, 10);
     });
+
+    function showResult() {
+      const index = Math.floor((360 - deg % 360) / segmentAngle) % options.length;
+      const prize = options[index];
+
+      result.innerHTML = `🎉 You won: <strong>${prize}</strong> 🎉<br><br>
+      <b>📸 Take a screenshot and send it to us on <a href="https://instagram.com/excess4fashion" target="_blank">@excess4fashion</a> to claim your gift.</b>`;
+
+      confetti({
+        particleCount: 200,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      winSound.play();
+    }
   </script>
 </body>
 </html>
