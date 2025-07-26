@@ -2,96 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎁 Spin & Win 🎁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin the Wheel - Excess4Fashion</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      background: #fff5f5;
+      background: #fff9e6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
     }
-
-    h1 {
-      font-size: 2.5em;
-      margin-top: 30px;
-    }
-
-    #wheel {
-      margin: 40px auto;
+    #wheel-container {
+      position: relative;
       width: 300px;
       height: 300px;
+      border: 10px solid red;
       border-radius: 50%;
-      border: 12px solid red;
-      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    #wheel {
+      width: 100%;
+      height: 100%;
       transition: transform 5s ease-out;
     }
-
-    .pointer {
+    #pointer {
       width: 0;
       height: 0;
-      border-left: 25px solid transparent;
-      border-right: 25px solid transparent;
-      border-bottom: 40px solid yellow;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid black;
       position: absolute;
-      top: -40px;
-      left: 125px;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
     }
-
-    #spin {
+    #spinBtn {
       background: yellow;
       color: black;
-      border: 2px solid black;
-      padding: 12px 25px;
       font-size: 20px;
+      padding: 10px 20px;
+      border: none;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 10px;
     }
-
     #result {
-      font-size: 1.5em;
-      margin-top: 25px;
-      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+      text-align: center;
     }
-
-    .footer {
-      margin-top: 30px;
-      font-size: 1.2em;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      pointer-events: none;
+    .claim-text {
+      color: #333;
+      font-size: 14px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-
-  <h1>🎁 Spin & Win 🎁</h1>
-  <div class="pointer"></div>
-  <canvas id="confetti-canvas"></canvas>
-
-  <canvas id="wheel" width="300" height="300"></canvas>
-
-  <button id="spin">SPIN NOW</button>
-
-  <p id="result"></p>
-
-  <div class="footer">
-    Follow us on <b style="color:#ff007f">@excess4fashion</b>
+  <div id="wheel-container">
+    <div id="pointer"></div>
+    <canvas id="wheel" width="300" height="300"></canvas>
   </div>
+  <button id="spinBtn">SPIN NOW</button>
+  <div id="result"></div>
 
-  <!-- 🎉 Confetti CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- 🔊 Sound CDN -->
-  <audio id="spinSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+  <audio id="spinSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
   <script>
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+    const result = document.getElementById("result");
+    const ctx = wheel.getContext("2d");
+    const spinSound = document.getElementById("spinSound");
+
     const prizes = [
       "10% OFF On Next order",
       "FREE (Surprise Gift)",
@@ -103,59 +90,63 @@
       "Free Gifts On Next order"
     ];
 
-    const colors = ["#ff9999", "#99ccff", "#ccffcc", "#ffc966", "#ffccff", "#b3e6b3", "#ffd699", "#c2c2f0"];
-    const wheel = document.getElementById("wheel");
-    const ctx = wheel.getContext("2d");
-    const result = document.getElementById("result");
-    const spinBtn = document.getElementById("spin");
-    const spinSound = document.getElementById("spinSound");
-
-    let angle = 0;
-    const arcSize = (2 * Math.PI) / prizes.length;
+    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#C9CBCF", "#FF6B6B"];
+    let anglePerSlice = (2 * Math.PI) / prizes.length;
 
     function drawWheel() {
       for (let i = 0; i < prizes.length; i++) {
-        const startAngle = i * arcSize;
-        ctx.fillStyle = colors[i % colors.length];
         ctx.beginPath();
+        ctx.fillStyle = colors[i];
         ctx.moveTo(150, 150);
-        ctx.arc(150, 150, 150, startAngle, startAngle + arcSize);
+        ctx.arc(150, 150, 150, i * anglePerSlice, (i + 1) * anglePerSlice);
         ctx.fill();
-
-        // Text
         ctx.save();
         ctx.translate(150, 150);
-        ctx.rotate(startAngle + arcSize / 2);
+        ctx.rotate(i * anglePerSlice + anglePerSlice / 2);
         ctx.fillStyle = "black";
-        ctx.font = "bold 13px sans-serif";
-        ctx.textAlign = "right";
-        ctx.fillText(prizes[i], 140, 5);
+        ctx.font = "bold 12px Arial";
+        ctx.fillText(prizes[i], 40, 5);
         ctx.restore();
       }
     }
 
     drawWheel();
 
+    function getStoredSpinStatus() {
+      return localStorage.getItem("hasSpun") === "true";
+    }
+
+    function storeSpinStatus() {
+      localStorage.setItem("hasSpun", "true");
+    }
+
     spinBtn.addEventListener("click", () => {
+      if (getStoredSpinStatus()) {
+        alert("You have already spun the wheel!");
+        return;
+      }
+
       spinSound.play();
 
-      const randomSpin = Math.floor(Math.random() * 360) + 1440; // Full spin + random
-      angle += randomSpin;
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const degree = 360 * 5 + (360 / prizes.length) * randomIndex + 360 / prizes.length / 2;
 
-      wheel.style.transform = `rotate(${angle}deg)`;
+      wheel.style.transition = "transform 5s ease-out";
+      wheel.style.transform = `rotate(${degree}deg)`;
 
-      const selectedIndex = Math.floor(prizes.length - (angle / (360 / prizes.length)) % prizes.length) % prizes.length;
+      storeSpinStatus();
 
       setTimeout(() => {
-        result.innerHTML = `🎉 You won: <strong>${prizes[selectedIndex]}</strong> 🎉`;
-
-        // Confetti
         confetti({
           particleCount: 150,
-          spread: 70,
-          origin: { y: 0.6 },
+          spread: 60
         });
-      }, 5200); // Match spin duration
+
+        result.innerHTML = `
+          <h2 class="result-text">🎉 You won: ${prizes[randomIndex]} 🎉</h2>
+          <p class="claim-text">📸 Take a screenshot and send it to us on Instagram <strong>@excess4fashion</strong> to claim your gift!</p>
+        `;
+      }, 5200);
     });
   </script>
 </body>
